@@ -1,0 +1,52 @@
+Name:    SVN-Look
+What:    A caching wrapper aroung the svnlook command.
+Version: 0.13
+Author:  Gustavo Chaves <gnustavo@cpan.org>
+
+SVN-Look is a caching wrapper aroung the svnlook command.
+
+The svnlook command is the workhorse of Subversion hook scripts, being
+used to gather all sorts of information about a repository, its
+revisions, and its transactions. This script provides a simple object
+oriented interface to a specific svnlook invocation, to make it easier
+to hook writers to get and use the information they need. Moreover,
+all the information gathered buy calling the svnlook command is cached
+in the object, avoiding repetitious calls.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc SVN::Look
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=SVN-Look
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/SVN-Look
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/SVN-Look
+
+    Search CPAN
+        http://search.cpan.org/dist/SVN-Look
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008 CPqD (http://www.cpqd.com.br/)
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

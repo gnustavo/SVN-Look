@@ -1,0 +1,35 @@
+Revision history for SVN-Look. -*- text -*-
+
+0.13	2008-11-06
+
+	Changing the LICENSE from GPL to Perl.
+
+0.12	2008-10-09
+
+	Removing dependency from SVN::Hooks from the tests.
+
+0.11	2008-10-04
+
+	Using File::Spec to be a little more portable.
+
+0.10	2008-09-27
+
+	Implemented the 'diff' method.
+
+0.09	2008-09-27
+	Removed dependency from Switch.pm.
+
+	Look for the svnlook command in a bunch of directories.
+
+	Now the module can be built without the svn commands but the
+	tests will check this and be skipped.
+
+	Added tests: t/pod.t and t/pod-coverage.t
+
+	Private functions got the _ prefix to avoid complaints from
+	pod-coverage.t. 
+
+0.08    2008-09-25/23:00:00
+        First version released independently of SVN::Hooks.
+
+
