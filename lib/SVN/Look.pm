@@ -108,8 +108,7 @@ sub new {
 
 sub _svnlook {
     my ($self, $cmd, @args) = @_;
-    my $fd;
-    open $fd, '-|', $SVNLOOK, $cmd, $self->{repo}, @{$self->{what}}, @args
+    open my $fd, '-|', $SVNLOOK, $cmd, $self->{repo}, @{$self->{what}}, @args
 	or die "Can't exec svnlook $cmd: $!\n";
     if (wantarray) {
 	my @lines = <$fd>;
