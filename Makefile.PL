@@ -12,10 +12,10 @@ for my $d (
     catfile('bin'),
 ) {
     my $f = catfile($d, 'svnlook');
-    if (-x $f) {
-	$svnlook = $f;
-	last;
-    }
+    next unless -x $f;
+    next unless system("$f help >/dev/null 2>/dev/null") == 0;
+    $svnlook = $f;
+    last;
 }
 die "Aborting because I couldn't find the 'svnlook' executable.\n"
     unless $svnlook;
