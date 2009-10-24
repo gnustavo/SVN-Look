@@ -3,8 +3,7 @@
 name: SVN-Look
 abstract: A caching wrapper aroung the svnlook command.
 version: 0.13
-author:
-  - Gustavo Chaves <gnustavo@cpan.org>
+author: Gustavo Chaves <gnustavo@cpan.org>
 license: perl
 generated_by: Gustavo Chaves
 distribution_type: module
