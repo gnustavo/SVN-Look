@@ -3,6 +3,16 @@ use strict;
 use warnings;
 use File::Spec::Functions qw/catfile path/;
 use ExtUtils::MakeMaker;
+use Getopt::Long  qw(GetOptions);
+
+# clean up the testing flag file.
+unlink('t/author.enabled');
+
+my $usage        = "$0 [--author-tests]\n";
+my $author_tests = 0;
+GetOptions(
+    'author-tests' => \$author_tests,
+) or die $usage;
 
 my $svnlook;
 for my $d (
@@ -19,6 +29,11 @@ for my $d (
 }
 die "Aborting because I couldn't find the 'svnlook' executable.\n"
     unless $svnlook;
+
+if ($author_tests) {
+    open(ENABLED, ">t/author.enabled") or die "Can't touch ./t/author.enabled: $!";
+    close(ENABLED)                     or die "Can't touch ./t/author.enabled: $!";
+}
 
 WriteMakefile(
     NAME                => 'SVN::Look',
