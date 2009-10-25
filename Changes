@@ -1,5 +1,14 @@
 Revision history for SVN-Look. -*- text -*-
 
+0.15	2009-10-24
+
+	Drops the sub-minor version. Now it's just M.mm.
+
+	Implements the kwalitee test.
+
+	Implements the --author-tests flag to Makefile.PL, which
+	enables the pod and kwalitee tests.
+
 0.13	2008-11-06
 
 	Changing the LICENSE from GPL to Perl.

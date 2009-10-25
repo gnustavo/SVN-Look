@@ -10,11 +10,11 @@ SVN::Look - A caching wrapper aroung the svnlook command.
 
 =head1 VERSION
 
-Version 0.13
+Version 0.15
 
 =cut
 
-our $VERSION = '0.14.' . substr(q$Revision$, 10); # bump from 10
+our $VERSION = '0.15';
 
 =head1 SYNOPSIS
 
