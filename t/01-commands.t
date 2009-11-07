@@ -6,8 +6,12 @@ use Test::More;
 
 require "test-functions.pl";
 
+my $nof_tests = 8;
+my $login = getlogin || getpwuid($<) || $ENV{USER};
+--$nof_tests unless $login;
+
 if (has_svn()) {
-    plan tests => 8;
+    plan tests => $nof_tests;
 }
 else {
     plan skip_all => 'Need svn commands in the PATH.';
@@ -26,7 +30,7 @@ my $look = SVN::Look->new("$t/repo", -r => 1);
 
 ok(defined $look, 'constructor');
 
-cmp_ok($look->author(), 'eq', $ENV{USER}, 'author');
+cmp_ok($look->author(), 'eq', $login, 'author');
 
 cmp_ok($look->log_msg(), 'eq', "log\n", 'log_msg');
 
