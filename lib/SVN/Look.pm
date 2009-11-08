@@ -1,7 +1,8 @@
 package SVN::Look;
 
-use warnings;
 use strict;
+use warnings;
+use Carp;
 use File::Spec::Functions qw/catfile path rootdir/;
 
 =head1 NAME
@@ -52,8 +53,8 @@ for my $d (
 ) {
     my $f = catfile($d, 'svnlook');
     if (-x $f) {
-	$SVNLOOK = $f;
-	last;
+        $SVNLOOK = $f;
+        last;
     }
 }
 die "Aborting because I couldn't find the svnlook executable.\n"
@@ -84,23 +85,23 @@ by WHAT.
 sub new {
     my ($class, $repo, $what, $txn_or_rev) = @_;
     my $self = {
-	repo     => $repo,
-	what     => [$what, $txn_or_rev],
-	txn      => undef,
-	rev      => undef,
-	author   => undef,
-	log      => undef,
-	changed  => undef,
-	proplist => undef,
+        repo     => $repo,
+        what     => [$what, $txn_or_rev],
+        txn      => undef,
+        rev      => undef,
+        author   => undef,
+        log      => undef,
+        changed  => undef,
+        proplist => undef,
     };
     if ($what eq '-t') {
-	$self->{txn} = $txn_or_rev;
+        $self->{txn} = $txn_or_rev;
     }
     elsif ($what eq '-r') {
-	$self->{rev} = $txn_or_rev;
+        $self->{rev} = $txn_or_rev;
     }
     else {
-	die "Look::new: third argument must be -t or -r, not ($what)";
+        croak "Look::new: third argument must be -t or -r, not ($what)";
     }
     bless $self, $class;
     return $self;
@@ -109,19 +110,19 @@ sub new {
 sub _svnlook {
     my ($self, $cmd, @args) = @_;
     open my $fd, '-|', $SVNLOOK, $cmd, $self->{repo}, @{$self->{what}}, @args
-	or die "Can't exec svnlook $cmd: $!\n";
+        or die "Can't exec svnlook $cmd: $!\n";
     if (wantarray) {
-	my @lines = <$fd>;
-	close $fd or die "Failed closing svnlook $cmd: $!\n";
-	chomp foreach @lines;
-	return @lines;
+        my @lines = <$fd>;
+        close $fd or die "Failed closing svnlook $cmd: $!\n";
+        chomp foreach @lines;
+        return @lines;
     }
     else {
-	local $/ = undef;
-	my $line = <$fd>;
-	close $fd or die "Failed closing svnlook $cmd: $!\n";
-	chomp $line;
-	return $line;
+        local $/ = undef;
+        my $line = <$fd>;
+        close $fd or die "Failed closing svnlook $cmd: $!\n";
+        chomp $line;
+        return $line;
     }
 }
 
@@ -169,7 +170,7 @@ Returns the author of the revision/transaction.
 sub author {
     my $self = shift;
     unless ($self->{author}) {
-	chomp($self->{author} = $self->_svnlook('author'));
+        chomp($self->{author} = $self->_svnlook('author'));
     }
     return $self->{author};
 }
@@ -183,7 +184,7 @@ Returns the log message of the revision/transaction.
 sub log_msg {
     my $self = shift;
     unless ($self->{log}) {
-	$self->{log} = $self->_svnlook('log');
+        $self->{log} = $self->_svnlook('log');
     }
     return $self->{log};
 }
@@ -197,7 +198,7 @@ Returns the date of the revision/transaction.
 sub date {
     my $self = shift;
     unless ($self->{date}) {
-	$self->{date} = ($self->_svnlook('info'))[1];
+        $self->{date} = ($self->_svnlook('info'))[1];
     }
     return $self->{date};
 }
@@ -211,11 +212,11 @@ Returns a reference to a hash containing the properties associated with PATH.
 sub proplist {
     my ($self, $path) = @_;
     unless ($self->{proplist}{$path}) {
-	my $text = $self->_svnlook('proplist', '--verbose', $path);
-	my @list = split /^\s\s(\S+)\s:\s/m, $text;
-	shift @list;		# skip the leading empty field
-	chomp(my %hash = @list);
-	$self->{proplist}{$path} = \%hash;
+        my $text = $self->_svnlook('proplist', '--verbose', $path);
+        my @list = split /^\s\s(\S+)\s:\s/m, $text;
+        shift @list;            # skip the leading empty field
+        chomp(my %hash = @list);
+        $self->{proplist}{$path} = \%hash;
     }
     return $self->{proplist}{$path};
 }
@@ -256,36 +257,36 @@ revision.
 sub changed_hash {
     my $self = shift;
     unless ($self->{changed_hash}) {
-	my (@added, @deleted, @updated, @prop_modified, %copied);
-	foreach ($self->_svnlook('changed', '--copy-info')) {
-	    next if length($_) <= 4;
-	    chomp;
-	    my ($action, $prop, undef, undef, $changed) = unpack 'AAAA A*', $_;
-	    if    ($action eq 'A') {
-		push @added,   $changed;
-	    }
-	    elsif ($action eq 'D') {
-		push @deleted, $changed;
-	    }
-	    elsif ($action eq 'U') {
-		push @updated, $changed;
-	    }
-	    else {
-		if ($changed =~ /^\(from (.*?):r(\d+)\)$/) {
-		    $copied{$added[-1]} = [$1 => $2];
-		}
-	    }
-	    if ($prop eq 'U') {
-		push @prop_modified, $changed;
-	    }
-	}
-	$self->{changed_hash} = {
-	    added         => \@added,
-	    deleted       => \@deleted,
-	    updated       => \@updated,
-	    prop_modified => \@prop_modified,
-	    copied        => \%copied,
-	};
+        my (@added, @deleted, @updated, @prop_modified, %copied);
+        foreach ($self->_svnlook('changed', '--copy-info')) {
+            next if length($_) <= 4;
+            chomp;
+            my ($action, $prop, undef, undef, $changed) = unpack 'AAAA A*', $_;
+            if    ($action eq 'A') {
+                push @added,   $changed;
+            }
+            elsif ($action eq 'D') {
+                push @deleted, $changed;
+            }
+            elsif ($action eq 'U') {
+                push @updated, $changed;
+            }
+            else {
+                if ($changed =~ /^\(from (.*?):r(\d+)\)$/) {
+                    $copied{$added[-1]} = [$1 => $2];
+                }
+            }
+            if ($prop eq 'U') {
+                push @prop_modified, $changed;
+            }
+        }
+        $self->{changed_hash} = {
+            added         => \@added,
+            deleted       => \@deleted,
+            updated       => \@updated,
+            prop_modified => \@prop_modified,
+            copied        => \%copied,
+        };
     }
     return $self->{changed_hash};
 }
@@ -346,7 +347,7 @@ sub changed {
     my $self = shift;
     my $hash = $self->changed_hash();
     unless (exists $hash->{changed}) {
-	$hash->{changed} = [@{$hash->{added}}, @{$hash->{updated}}, @{$hash->{deleted}}, @{$hash->{prop_modified}}];
+        $hash->{changed} = [@{$hash->{added}}, @{$hash->{updated}}, @{$hash->{deleted}}, @{$hash->{prop_modified}}];
     }
     return @{$hash->{changed}};
 }
@@ -360,8 +361,8 @@ Returns the list of directories changed in the revision/transaction.
 sub dirs_changed {
     my $self = shift;
     unless (exists $self->{dirs_changed}) {
-	my @dirs = $self->_svnlook('dirs-changed');
-	$self->{dirs_changed} = \@dirs;
+        my @dirs = $self->_svnlook('dirs-changed');
+        $self->{dirs_changed} = \@dirs;
     }
     return @{$self->{dirs_changed}};
 }
