@@ -30,7 +30,8 @@ my $look = SVN::Look->new("$t/repo", -r => 1);
 
 ok(defined $look, 'constructor');
 
-cmp_ok($look->author(), 'eq', $login, 'author');
+cmp_ok($look->author(), 'eq', $login, 'author')
+    if $login;
 
 cmp_ok($look->log_msg(), 'eq', "log\n", 'log_msg');
 
