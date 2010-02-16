@@ -2,7 +2,7 @@
 # http://module-build.sourceforge.net/META-spec.html
 name: SVN-Look
 abstract: A caching wrapper aroung the svnlook command.
-version: 0.15
+version: 0.16
 author: Gustavo Chaves <gnustavo@cpan.org>
 license: perl
 generated_by: Gustavo Chaves

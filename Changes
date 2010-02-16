@@ -1,5 +1,13 @@
 Revision history for SVN-Look. -*- text -*-
 
+0.16	2010-02-16
+
+	Implements the methods: youngest, uuid, and lock.
+
+	Bypasses an issue in the testing of method author.
+
+	Croaks instead of dying.
+
 0.15	2009-10-24
 
 	Drops the sub-minor version. Now it's just M.mm.
