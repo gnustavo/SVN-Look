@@ -109,7 +109,9 @@ sub new {
 
 sub _svnlook {
     my ($self, $cmd, @args) = @_;
-    open my $fd, '-|', $SVNLOOK, $cmd, $self->{repo}, @{$self->{what}}, @args
+    my @cmd = ($SVNLOOK, $cmd, $self->{repo});
+    push @cmd, @{$self->{what}} unless $cmd =~ /^(?:youngest|uuid|lock)$/;
+    open my $fd, '-|', @cmd, @args
         or die "Can't exec svnlook $cmd: $!\n";
     if (wantarray) {
         my @lines = <$fd>;
@@ -436,6 +438,75 @@ sub diff {
     return $self->_svnlook('diff', @opts);
 }
 
+=item B<youngest>
+
+Returns the repository's youngest revision number.
+
+=cut
+
+sub youngest {
+    my ($self) = @_;
+    return $self->_svnlook('youngest');
+}
+
+=item B<uuid>
+
+Returns the repository's UUID.
+
+=cut
+
+sub uuid {
+    my ($self) = @_;
+    return $self->_svnlook('uuid');
+}
+
+=item B<lock> PATH
+
+If PATH has a lock, returns a hash containing information about the lock, with the following keys:
+
+=over
+
+=item UUID Token
+
+A string with the opaque lock token.
+
+=item Owner
+
+The name of the user that has the lock.
+
+=item Created
+
+The time at which the lock was created, in a format like this: '2010-02-16 17:23:08 -0200 (Tue, 16 Feb 2010)'.
+
+=item Comment
+
+The lock comment.
+
+=back
+
+If PATH has no lock, returns undef.
+
+=cut
+
+sub lock {
+    my ($self, $path) = @_;
+    my %lock = ();
+    my @lock = $self->_svnlook('lock', $path);
+
+    while (my $line = shift @lock) {
+	chomp $line;
+	my ($key, $value) = split /:\s*/, $line, 2;
+	if ($key =~ /^Comment/) {
+	    $lock{Comment} = join('', @lock);
+	}
+	else {
+	    $lock{$key} = $value;
+	}
+    }
+
+    return %lock ? \%lock : undef;
+}
+
 =back
 
 =head1 AUTHOR
@@ -478,7 +549,7 @@ L<http://search.cpan.org/dist/SVN-Hooks>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2008 CPqD, all rights reserved.
+Copyright 2008-2010 CPqD, all rights reserved.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
