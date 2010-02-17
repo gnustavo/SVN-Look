@@ -498,6 +498,7 @@ sub lock {
 	my ($key, $value) = split /:\s*/, $line, 2;
 	if ($key =~ /^Comment/) {
 	    $lock{Comment} = join('', @lock);
+	    last;
 	}
 	else {
 	    $lock{$key} = $value;
