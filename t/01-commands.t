@@ -6,12 +6,8 @@ use Test::More;
 
 require "test-functions.pl";
 
-my $nof_tests = 12;
-my $login = getlogin || getpwuid($<) || $ENV{USER};
---$nof_tests unless $login;
-
 if (has_svn()) {
-    plan tests => $nof_tests;
+    plan tests => 13;
 }
 else {
     plan skip_all => 'Need svn commands in the PATH.';
@@ -30,8 +26,20 @@ my $look = SVN::Look->new("$t/repo", -r => 1);
 
 ok(defined $look, 'constructor');
 
-cmp_ok($look->author(), 'eq', $login, 'author')
-    if $login;
+# Grok the author name
+my $author;
+open my $svn, '-|', "svn info $t/wc/file"
+    or die "Can't exec svn info\n";
+while (<$svn>) {
+    if (/Author: (.*)$/) {
+	$author = $1;
+	last;
+    }
+}
+close $svn;
+ok(defined $author, 'grok author');
+
+cmp_ok($look->author(), 'eq', $author, 'author');
 
 cmp_ok($look->log_msg(), 'eq', "log\n", 'log_msg');
 
