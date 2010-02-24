@@ -33,7 +33,6 @@ open my $svn, '-|', "svn info $t/wc/file"
 while (<$svn>) {
     if (/Author: (.*)$/) {
 	$author = $1;
-	last;
     }
 }
 close $svn;
