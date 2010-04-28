@@ -1,5 +1,9 @@
 Revision history for SVN-Look. -*- text -*-
 
+0.18	2010-04-28
+
+	Being more careful during tests.
+
 0.17    2010-02-24
 
 	Minor error correction.
