@@ -508,6 +508,35 @@ sub lock {
     return %lock ? \%lock : undef;
 }
 
+=item B<tree> [PATH_IN_REPOS, OPTS, ...]
+
+Returns the repository tree as a list of paths, starting at
+PATH_IN_REPOS (if supplied, at the root of the tree otherwise),
+optionally showing node revision ids.
+
+=over
+
+=item C<--full-paths>
+
+show full paths instead of indenting them.
+
+=item C<--show-ids>
+
+Returns the node revision ids for each path.
+
+=item C<--non-recursive>
+
+Operate on single directory only.
+
+=back
+
+=cut
+
+sub tree {
+    my ($self, @opts) = @_;
+    return $self->_svnlook('tree', @opts);
+}
+
 =back
 
 =head1 AUTHOR
