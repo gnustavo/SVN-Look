@@ -1,5 +1,9 @@
 Revision history for SVN-Look. -*- text -*-
 
+0.19	2010-12-12
+
+	Implements the method tree.
+
 0.18	2010-04-28
 
 	Being more careful during tests.
