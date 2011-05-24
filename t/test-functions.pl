@@ -14,6 +14,7 @@ use Cwd;
 use File::Temp qw/tempdir/;
 use File::Spec::Functions;
 use File::Path;
+use File::Copy;
 use File::Slurp;
 use URI::file;
 
@@ -54,6 +55,8 @@ sub do_script {
 	close $fd;
 	chmod 0755, $script;
     }
+    copy("$T/repo/hooks/svn-hooks.pl", "$dir/svn-hooks.pl");
+    copy("$T/repo/conf/svn-hooks.conf", "$dir/svn-hooks.conf");
 
     system("$script 1>$stdout 2>$stderr");
 }
@@ -98,15 +101,11 @@ sub reset_repo {
     my $repo = catfile($T, 'repo');
     my $wc   = catfile($T, 'wc');
 
-    system(<<"EOS");
-svnadmin create $repo
-EOS
+    system("svnadmin create $repo");
 
     my $repouri = URI::file->new($repo);
 
-    system(<<"EOS");
-svn co -q $repouri $wc
-EOS
+    system("svn co -q $repouri $wc");
 
     return $T;
 }
