@@ -1,7 +1,7 @@
 use 5.008;
 use strict;
 use warnings;
-use File::Spec::Functions qw/catfile path/;
+use File::Spec::Functions;
 use ExtUtils::MakeMaker;
 use Getopt::Long  qw(GetOptions);
 
@@ -15,20 +15,21 @@ GetOptions(
 ) or die $usage;
 
 my $svnlook;
-for my $d (
-    path(),
-    catfile('usr', 'local', 'bin'),
-    catfile('usr', 'bin'),
-    catfile('bin'),
-) {
-    my $f = catfile($d, 'svnlook');
-    next unless -x $f;
-    next unless system("$f help >/dev/null 2>/dev/null") == 0;
-    $svnlook = $f;
-    last;
+
+if ($^O eq 'MSWin32') {
+    $ENV{PATH} .= ';C:\Program Files (x86)\VisualSVN Server\bin';
+} else {
+    $ENV{PATH} .= ':/usr/local/bin:/usr/bin:/bin';
 }
+
+eval {
+    open my $svnlook, '-|', 'svnlook --version' or die;
+    local $/ = undef;		# slurp mode
+    <$svnlook>;
+    close $svnlook or die;
+};
 die "Aborting because I couldn't find the 'svnlook' executable.\n"
-    unless $svnlook;
+    if $@;
 
 if ($author_tests) {
     open(ENABLED, ">t/author.enabled") or die "Can't touch ./t/author.enabled: $!";
