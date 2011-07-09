@@ -55,8 +55,8 @@ sub do_script {
 	close $fd;
 	chmod 0755, $script;
     }
-    copy("$T/repo/hooks/svn-hooks.pl", "$dir/svn-hooks.pl");
-    copy("$T/repo/conf/svn-hooks.conf", "$dir/svn-hooks.conf");
+    copy(catfile($T, 'repo', 'hooks', 'svn-hooks.pl')   => catfile($dir, 'svn-hooks.pl'));
+    copy(catfile($T, 'repo', 'conf',  'svn-hooks.conf') => catfile($dir, 'svn-hooks.conf'));
 
     system("$script 1>$stdout 2>$stderr");
 }
