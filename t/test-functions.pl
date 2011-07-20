@@ -1,13 +1,14 @@
 # Copyright (C) 2008 by CPqD
 
-BEGIN { $ENV{PATH} = '/usr/local/bin:/usr/bin:/bin' }
-
 use strict;
 use warnings;
 use Cwd;
 use File::Temp qw/tempdir/;
-use File::Spec::Functions qw/catfile path/;
+use File::Spec::Functions;
 use File::Path;
+use File::Copy;
+use File::Slurp;
+use URI::file;
 
 # Make sure the svn messages come in English.
 $ENV{LC_MESSAGES} = 'C';
@@ -15,45 +16,49 @@ $ENV{LC_MESSAGES} = 'C';
 sub can_svn {
   CMD:
     for my $cmd (qw/svn svnadmin svnlook/) {
-	for my $path (path()) {
-	    next CMD if -x catfile($path, $cmd);
-	}
-	return 0;
+	eval {
+	    open my $pipe, '-|', "$cmd --version" or die;
+	    local $/ = undef;		# slurp mode
+	    <$pipe>;
+	    close $pipe or die;
+	};
+	return 0 if $@;
     }
-
-    my $T = tempdir('t.XXXX', DIR => getcwd());
-    my $canuseit = system("svnadmin create $T/repo") == 0;
-    rmtree($T);
-
-    return $canuseit;
+    return 1;
 }
 
 our $T;
 
 sub newdir {
     my $num = 1 + Test::Builder->new()->current_test();
-    my $dir = "$T/$num";
+    my $dir = catdir($T, $num);
     mkdir $dir;
     $dir;
 }
 
 sub do_script {
     my ($dir, $cmd) = @_;
+    my $script = catfile($dir, 'script');
+    my $stdout = catfile($dir, 'stdout');
+    my $stderr = catfile($dir, 'stderr');
     {
-	open my $script, '>', "$dir/script" or die;
-	print $script $cmd;
-	close $script;
-	chmod 0755, "$dir/script";
+	open my $fd, '>', $script or die;
+	print $fd $cmd;
+	close $fd;
+	chmod 0755, $script;
     }
+    copy(catfile($T, 'repo', 'hooks', 'svn-hooks.pl')   => catfile($dir, 'svn-hooks.pl'));
+    copy(catfile($T, 'repo', 'conf',  'svn-hooks.conf') => catfile($dir, 'svn-hooks.conf'));
 
-    system("$dir/script 1>$dir/stdout 2>$dir/stderr");
+    system("$script 1>$stdout 2>$stderr");
 }
 
 sub work_ok {
     my ($tag, $cmd) = @_;
     my $dir = newdir();
     ok((do_script($dir, $cmd) == 0), $tag)
-	or diag("work_ok command failed with following stderr:\n", `cat $dir/stderr`);
+	or diag("work_ok command failed with following stderr:\n",
+		scalar(read_file(catfile($dir, 'stderr'))));
 }
 
 sub work_nok {
@@ -66,7 +71,7 @@ sub work_nok {
 	return;
     }
 
-    my $stderr = `cat $dir/stderr`;
+    my $stderr = scalar(read_file(catfile($dir, 'stderr')));
 
     if (! ref $error_expect) {
 	ok(index($stderr, $error_expect) >= 0, $tag)
@@ -85,13 +90,14 @@ sub reset_repo {
     my $cleanup = exists $ENV{REPO_CLEANUP} ? $ENV{REPO_CLEANUP} : 1;
     $T = tempdir('t.XXXX', DIR => getcwd(), CLEANUP => $cleanup);
 
-    system(<<"EOS");
-svnadmin create $T/repo
-EOS
+    my $repo = catfile($T, 'repo');
+    my $wc   = catfile($T, 'wc');
 
-    system(<<"EOS");
-svn co -q file://$T/repo $T/wc
-EOS
+    system("svnadmin create $repo");
+
+    my $repouri = URI::file->new($repo);
+
+    system("svn co -q $repouri $wc");
 
     return $T;
 }

@@ -3,7 +3,7 @@ package SVN::Look;
 use strict;
 use warnings;
 use Carp;
-use File::Spec::Functions qw/catfile path rootdir/;
+use File::Spec::Functions;
 
 =head1 NAME
 
@@ -43,22 +43,21 @@ in the object, avoiding repetitious calls.
 
 =cut
 
-our $SVNLOOK;
-my $root = rootdir();
-for my $d (
-    path(),
-    catfile($root, 'usr', 'local', 'bin'),
-    catfile($root, 'usr', 'bin'),
-    catfile($root, 'bin'),
-) {
-    my $f = catfile($d, 'svnlook');
-    if (-x $f) {
-        $SVNLOOK = $f;
-        last;
+BEGIN {
+    if ($^O eq 'MSWin32') {
+	$ENV{PATH} .= ';C:\Program Files (x86)\VisualSVN Server\bin';
+    } else {
+	$ENV{PATH} .= ':/usr/local/bin:/usr/bin:/bin';
     }
+    eval {
+	open my $pipe, '-|', "svnlook --version" or die;
+	local $/ = undef;		# slurp mode
+	<$pipe>;
+	close $pipe or die;
+    };
+    die "Aborting because I couldn't execute the svnlook command: $@\n"
+	if $@;
 }
-die "Aborting because I couldn't find the svnlook executable.\n"
-    unless $SVNLOOK;
 
 =head1 METHODS
 
@@ -109,9 +108,9 @@ sub new {
 
 sub _svnlook {
     my ($self, $cmd, @args) = @_;
-    my @cmd = ($SVNLOOK, $cmd, $self->{repo});
+    my @cmd = (svnlook => $cmd, $self->{repo});
     push @cmd, @{$self->{what}} unless $cmd =~ /^(?:youngest|uuid|lock)$/;
-    open my $fd, '-|', @cmd, @args
+    open my $fd, '-|', '"' . join('"  "', @cmd, @args) . '"'
         or die "Can't exec svnlook $cmd: $!\n";
     if (wantarray) {
         my @lines = <$fd>;
