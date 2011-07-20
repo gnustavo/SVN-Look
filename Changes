@@ -1,5 +1,9 @@
 Revision history for SVN-Look. -*- text -*-
 
+0.21	2011-07-20
+
+	Ported to Windows with Strawberry Perl and also with Active Perl.
+
 0.20	2010-12-12
 
 	Fix methods copied_from and copied_to.
