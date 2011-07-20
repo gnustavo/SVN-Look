@@ -1,4 +1,3 @@
-.cvsignore
 Changes
 lib/SVN/Look.pm
 Makefile.PL
