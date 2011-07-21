@@ -16,12 +16,6 @@ GetOptions(
 
 my $svnlook;
 
-if ($^O eq 'MSWin32') {
-    $ENV{PATH} .= ';C:\Program Files (x86)\VisualSVN Server\bin';
-} else {
-    $ENV{PATH} .= ':/usr/local/bin:/usr/bin:/bin';
-}
-
 eval {
     open my $svnlook, '-|', 'svnlook --version' or die;
     local $/ = undef;		# slurp mode
