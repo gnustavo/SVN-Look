@@ -1,5 +1,9 @@
 Revision history for SVN-Look. -*- text -*-
 
+0.22	2011-07-21
+
+	Avoiding dependency from File::Slurp in the tests.
+
 0.21	2011-07-20
 
 	Ported to Windows with Strawberry Perl and also with Active Perl.
