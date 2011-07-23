@@ -6,7 +6,8 @@ use ExtUtils::MakeMaker;
 use Getopt::Long  qw(GetOptions);
 
 # clean up the testing flag file.
-unlink('t/author.enabled');
+my $t_author = catfile('t', 'author.enabled');
+unlink($t_author);
 
 my $usage        = "$0 [--author-tests]\n";
 my $author_tests = 0;
@@ -26,15 +27,17 @@ die "Aborting because I couldn't find the 'svnlook' executable.\n"
     if $@;
 
 if ($author_tests) {
-    open(ENABLED, ">t/author.enabled") or die "Can't touch ./t/author.enabled: $!";
-    close(ENABLED)                     or die "Can't touch ./t/author.enabled: $!";
+    open(ENABLED, '>', $t_author) or die "Can't touch $t_author: $!\n";
+    close(ENABLED)                or die "Can't touch $t_author: $!\n";
 }
+
+my $look_pm = catfile('lib', 'SVN', 'Look.pm');
 
 WriteMakefile(
     NAME                => 'SVN::Look',
     AUTHOR              => 'Gustavo Chaves <gustavo+perl@gnustavo.org>',
-    VERSION_FROM        => 'lib/SVN/Look.pm',
-    ABSTRACT_FROM       => 'lib/SVN/Look.pm',
+    VERSION_FROM        => $look_pm,
+    ABSTRACT_FROM       => $look_pm,
     PL_FILES            => {},
     PREREQ_PM => {
         'Test::More'    => 0,
