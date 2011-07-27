@@ -10,5 +10,6 @@ distribution_type: module
 requires:
   Test::More: 0
   File::Spec::Functions: 0
+  URI::file: 0
 resources:
   license: http://dev.perl.org/licenses/

@@ -42,6 +42,7 @@ WriteMakefile(
     PREREQ_PM => {
         'Test::More'    => 0,
 	'File::Spec::Functions' => 0,
+	'URI::file' => 0,
     },
     dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean               => { FILES => 'SVN-Look-*' },
