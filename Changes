@@ -1,5 +1,10 @@
 Revision history for SVN-Look. -*- text -*-
 
+0.23	2011-07-27
+
+	Porting Makefile.PL to Windows.
+	Adding URI::file to the dependencies.
+
 0.22	2011-07-21
 
 	Avoiding dependency from File::Slurp in the tests.
