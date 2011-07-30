@@ -1,5 +1,9 @@
 Revision history for SVN-Look. -*- text -*-
 
+0.24	2011-07-30
+
+	Tests grok username using svnlook to be sure.
+
 0.23	2011-07-27
 
 	Porting Makefile.PL to Windows.
