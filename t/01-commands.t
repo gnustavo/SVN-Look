@@ -28,16 +28,7 @@ my $look = SVN::Look->new($repo, -r => 1);
 ok(defined $look, 'constructor');
 
 # Grok the author name
-my $author;
-open my $svn, '-|', "svn info $wcfile"
-    or die "Can't exec svn info\n";
-while (<$svn>) {
-    if (/Author: (.*)$/) {
-	$author = $1;
-    }
-}
-close $svn;
-ok(defined $author, 'grok author');
+ok(my $author = get_author($t), 'grok author');
 
 cmp_ok($look->author(), 'eq', $author, 'author');
 

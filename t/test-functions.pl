@@ -1,4 +1,4 @@
-# Copyright (C) 2008 by CPqD
+# Copyright (C) 2008-2011 by CPqD
 
 use strict;
 use warnings;
@@ -90,6 +90,17 @@ sub work_nok {
 	fail($tag);
 	diag("work_nok: invalid second argument to test.\n");
     }
+}
+
+sub get_author {
+    my ($t) = @_;
+    my $repo = catfile($t, 'repo');
+    open my $cmd, '-|', "svnlook info $repo"
+	or die "Can't exec svn info\n";
+    chomp(my $author = <$cmd>);
+    local $/ = undef; <$cmd>;
+    close $cmd;
+    return $author;
 }
 
 sub reset_repo {
