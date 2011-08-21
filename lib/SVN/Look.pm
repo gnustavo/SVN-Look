@@ -117,7 +117,7 @@ sub _svnlook {
         local $/ = undef;
         my $line = <$fd>;
         close $fd or die "Failed closing svnlook $cmd: $!\n";
-        chomp $line;
+        chomp $line unless $cmd eq 'cat';
         return $line;
     }
 }
