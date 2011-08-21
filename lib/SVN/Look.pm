@@ -44,11 +44,6 @@ in the object, avoiding repetitious calls.
 =cut
 
 BEGIN {
-    if ($^O eq 'MSWin32') {
-	$ENV{PATH} .= ';C:\Program Files (x86)\VisualSVN Server\bin';
-    } else {
-	$ENV{PATH} .= ':/usr/local/bin:/usr/bin:/bin';
-    }
     eval {
 	open my $pipe, '-|', "svnlook --version" or die;
 	local $/ = undef;		# slurp mode
