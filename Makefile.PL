@@ -15,8 +15,7 @@ GetOptions(
     'author-tests' => \$author_tests,
 ) or die $usage;
 
-my $svnlook;
-
+# Check if we have the svnlook command.
 eval {
     open my $svnlook, '-|', 'svnlook --version' or die;
     local $/ = undef;		# slurp mode
