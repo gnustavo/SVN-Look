@@ -110,7 +110,7 @@ sub _svnlook {
     if (wantarray) {
         my @lines = <$fd>;
         close $fd or die "Failed closing svnlook $cmd: $!\n";
-        chomp foreach @lines;
+        chomp @lines;
         return @lines;
     }
     else {
