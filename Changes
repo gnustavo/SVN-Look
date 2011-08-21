@@ -1,5 +1,12 @@
 Revision history for SVN-Look. -*- text -*-
 
+0.25	2011-08-21
+
+	Method ::cat don't chomp the file contents when called in
+	scalar context anymore.
+
+	Don't append hardcoded paths to $ENV{PATH} anymore.
+
 0.24	2011-07-30
 
 	Tests grok username using svnlook to be sure.
