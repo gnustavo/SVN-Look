@@ -1,5 +1,9 @@
 Revision history for SVN-Look. -*- text -*-
 
+0.26    2011-08-27
+
+	Requiring at least svnlook version 1.4.0.
+
 0.25	2011-08-21
 
 	Method ::cat don't chomp the file contents when called in
