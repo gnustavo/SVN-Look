@@ -44,14 +44,18 @@ in the object, avoiding repetitious calls.
 =cut
 
 BEGIN {
-    eval {
-	open my $pipe, '-|', "svnlook --version" or die;
-	local $/ = undef;		# slurp mode
-	<$pipe>;
-	close $pipe or die;
-    };
-    die "Aborting because I couldn't execute the svnlook command: $@\n"
-	if $@;
+    open my $svnlook, '-|', 'svnlook --version'
+	or die "Aborting because I couldn't find the 'svnlook' executable in PATH=$ENV{PATH}.\n";
+    $_ = <$svnlook>;
+    if (my ($major, $minor, $patch) = (/(\d+)\.(\d+)\.(\d+)/)) {
+	$major > 1 || $major == 1 && $minor >= 4
+	    or die "I need at least version 1.4.0 of svnlook but you have only $major.$minor.$patch.\n";
+    } else {
+	die "Can't grok Subversion version from svnlook --version command.\n";
+    }
+    local $/ = undef;		# slurp mode
+    <$svnlook>;
+    close $svnlook or die "Can't close svnlook commnand.\n";
 }
 
 =head1 METHODS
