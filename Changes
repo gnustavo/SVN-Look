@@ -1,5 +1,11 @@
 Revision history for SVN-Look. -*- text -*-
 
+0.27    2011-09-17
+
+	Make the arguments -r/-t optional.
+	Remove unecessary methods 'repo', 'rev', and 'txn'.
+	Implement methods 'date', 'info', and 'propget'.
+
 0.26    2011-08-27
 
 	Requiring at least svnlook version 1.4.0.

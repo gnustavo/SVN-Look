@@ -1,6 +1,6 @@
 Name:    SVN-Look
 What:    A caching wrapper aroung the svnlook command.
-Version: 0.26
+Version: 0.27
 Author:  Gustavo Chaves <gnustavo@cpan.org>
 
 SVN-Look is a caching wrapper aroung the svnlook command.
@@ -46,7 +46,7 @@ You can also look for information at:
 
 COPYRIGHT AND LICENCE
 
-Copyright (C) 2008-2010 CPqD (http://www.cpqd.com.br/)
+Copyright (C) 2008-2011 CPqD (http://www.cpqd.com.br/)
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
