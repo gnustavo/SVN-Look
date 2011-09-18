@@ -63,9 +63,9 @@ BEGIN {
 
 =over 4
 
-=item B<new> REPO, WHAT, NUMBER
+=item B<new> REPO [, WHAT, NUMBER]
 
-The SVN::Look constructor needs three arguments:
+The SVN::Look constructor needs one or three arguments:
 
 =over
 
@@ -82,26 +82,11 @@ by WHAT.
 =cut
 
 sub new {
-    my ($class, $repo, $what, $txn_or_rev) = @_;
+    my ($class, $repo, @opts) = @_;
     my $self = {
-        repo     => $repo,
-        what     => [$what, $txn_or_rev],
-        txn      => undef,
-        rev      => undef,
-        author   => undef,
-        log      => undef,
-        changed  => undef,
-        proplist => undef,
+        repo => $repo,
+        opts => [@opts],
     };
-    if ($what eq '-t') {
-        $self->{txn} = $txn_or_rev;
-    }
-    elsif ($what eq '-r') {
-        $self->{rev} = $txn_or_rev;
-    }
-    else {
-        croak "Look::new: third argument must be -t or -r, not ($what)";
-    }
     bless $self, $class;
     return $self;
 }
@@ -109,7 +94,7 @@ sub new {
 sub _svnlook {
     my ($self, $cmd, @args) = @_;
     my @cmd = (svnlook => $cmd, $self->{repo});
-    push @cmd, @{$self->{what}} unless $cmd =~ /^(?:youngest|uuid|lock)$/;
+    push @cmd, @{$self->{opts}} unless $cmd =~ /^(?:youngest|uuid|lock)$/;
     open my $fd, '-|', '"' . join('"  "', @cmd, @args) . '"'
         or die "Can't exec svnlook $cmd: $!\n";
     if (wantarray) {
@@ -127,41 +112,6 @@ sub _svnlook {
     }
 }
 
-=item B<repo>
-
-Returns the repository path that was passed to the constructor.
-
-=cut
-
-sub repo {
-    my $self = shift;
-    return $self->{repo};
-}
-
-=item B<txn>
-
-Returns the transaction number that was passed to the constructor. If
-none was passed, returns undef.
-
-=cut
-
-sub txn {
-    my $self = shift;
-    return $self->{txn};
-}
-
-=item B<rev>
-
-Returns the revision number that was passed to the constructor. If
-none was passed, returns undef.
-
-=cut
-
-sub rev {
-    my $self = shift;
-    return $self->{rev};
-}
-
 =item B<author>
 
 Returns the author of the revision/transaction.
@@ -170,56 +120,23 @@ Returns the author of the revision/transaction.
 
 sub author {
     my $self = shift;
-    unless ($self->{author}) {
+    unless (exists $self->{author}) {
         chomp($self->{author} = $self->_svnlook('author'));
     }
     return $self->{author};
 }
 
-=item B<log_msg>
+=item B<cat> PATH
 
-Returns the log message of the revision/transaction.
-
-=cut
-
-sub log_msg {
-    my $self = shift;
-    unless ($self->{log}) {
-        $self->{log} = $self->_svnlook('log');
-    }
-    return $self->{log};
-}
-
-=item B<date>
-
-Returns the date of the revision/transaction.
+Returns the contents of the file at PATH. In scalar context, return
+the whole contents in a single string. In list context returns a list
+of chomped lines.
 
 =cut
 
-sub date {
-    my $self = shift;
-    unless ($self->{date}) {
-        $self->{date} = ($self->_svnlook('info'))[1];
-    }
-    return $self->{date};
-}
-
-=item B<proplist> PATH
-
-Returns a reference to a hash containing the properties associated with PATH.
-
-=cut
-
-sub proplist {
+sub cat {
     my ($self, $path) = @_;
-    unless ($self->{proplist}{$path}) {
-        my $text = $self->_svnlook('proplist', '--verbose', $path);
-        my @list = split /^\s\s(\S+)\s:\s/m, $text;
-        shift @list;            # skip the leading empty field
-        chomp(my %hash = @list);
-        $self->{proplist}{$path} = \%hash;
-    }
-    return $self->{proplist}{$path};
+    return $self->_svnlook('cat', $path);
 }
 
 =item B<changed_hash>
@@ -352,21 +269,6 @@ sub changed {
     return @{$hash->{changed}};
 }
 
-=item B<dirs_changed>
-
-Returns the list of directories changed in the revision/transaction.
-
-=cut
-
-sub dirs_changed {
-    my $self = shift;
-    unless (exists $self->{dirs_changed}) {
-        my @dirs = $self->_svnlook('dirs-changed');
-        $self->{dirs_changed} = \@dirs;
-    }
-    return @{$self->{dirs_changed}};
-}
-
 =item B<copied_to>
 
 Returns the list of new names of files that were copied in the
@@ -392,17 +294,18 @@ sub copied_from {
     return map {$_->[0]} values %{$self->changed_hash()->{copied}};
 }
 
-=item B<cat> PATH
+=item B<date>
 
-Returns the contents of the file at PATH. In scalar context, return
-the whole contents in a single string. In list context returns a list
-of chomped lines.
+Returns the date of the revision/transaction.
 
 =cut
 
-sub cat {
-    my ($self, $path) = @_;
-    return $self->_svnlook('cat', $path);
+sub date {
+    my $self = shift;
+    unless (exists $self->{date}) {
+        $self->{date} = $self->_svnlook('date');
+    }
+    return $self->{date};
 }
 
 =item B<diff> [OPTS, ...]
@@ -436,26 +339,31 @@ sub diff {
     return $self->_svnlook('diff', @opts);
 }
 
-=item B<youngest>
+=item B<dirs_changed>
 
-Returns the repository's youngest revision number.
+Returns the list of directories changed in the revision/transaction.
 
 =cut
 
-sub youngest {
-    my ($self) = @_;
-    return $self->_svnlook('youngest');
+sub dirs_changed {
+    my $self = shift;
+    unless (exists $self->{dirs_changed}) {
+        my @dirs = $self->_svnlook('dirs-changed');
+        $self->{dirs_changed} = \@dirs;
+    }
+    return @{$self->{dirs_changed}};
 }
 
-=item B<uuid>
+=item B<info>
 
-Returns the repository's UUID.
+Returns the author, datestamp, log message size, and log message of
+the revision/transaction.
 
 =cut
 
-sub uuid {
-    my ($self) = @_;
-    return $self->_svnlook('uuid');
+sub info {
+    my $self = shift;
+    return $self->_svnlook('info');
 }
 
 =item B<lock> PATH
@@ -506,6 +414,49 @@ sub lock {
     return %lock ? \%lock : undef;
 }
 
+=item B<log_msg>
+
+Returns the log message of the revision/transaction.
+
+=cut
+
+sub log_msg {
+    my $self = shift;
+    unless (exists $self->{log}) {
+        $self->{log} = $self->_svnlook('log');
+    }
+    return $self->{log};
+}
+
+=item B<propget> PROPNAME PATH
+
+Returns the value of PROPNAME in PATH.
+
+=cut
+
+sub propget {
+    my ($self, @args) = @_;
+    return $self->_svnlook('propget', @args);
+}
+
+=item B<proplist> PATH
+
+Returns a reference to a hash containing the properties associated with PATH.
+
+=cut
+
+sub proplist {
+    my ($self, $path) = @_;
+    unless ($self->{proplist}{$path}) {
+        my $text = $self->_svnlook('proplist', '--verbose', $path);
+        my @list = split /^\s\s(\S+)\s:\s/m, $text;
+        shift @list;            # skip the leading empty field
+        chomp(my %hash = @list);
+        $self->{proplist}{$path} = \%hash;
+    }
+    return $self->{proplist}{$path};
+}
+
 =item B<tree> [PATH_IN_REPOS, OPTS, ...]
 
 Returns the repository tree as a list of paths, starting at
@@ -531,8 +482,30 @@ Operate on single directory only.
 =cut
 
 sub tree {
-    my ($self, @opts) = @_;
-    return $self->_svnlook('tree', @opts);
+    my ($self, @args) = @_;
+    return $self->_svnlook('tree', @args);
+}
+
+=item B<uuid>
+
+Returns the repository's UUID.
+
+=cut
+
+sub uuid {
+    my ($self) = @_;
+    return $self->_svnlook('uuid');
+}
+
+=item B<youngest>
+
+Returns the repository's youngest revision number.
+
+=cut
+
+sub youngest {
+    my ($self) = @_;
+    return $self->_svnlook('youngest');
 }
 
 =back

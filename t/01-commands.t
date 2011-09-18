@@ -7,7 +7,7 @@ use Test::More;
 require "test-functions.pl";
 
 if (can_svn()) {
-    plan tests => 13;
+    plan tests => 14;
 }
 else {
     plan skip_all => 'Cannot find or use svn commands.';
@@ -50,7 +50,8 @@ system("svn add -q --no-auto-props \"$ab\"");
 system("svn ps -q svn:mime-type text/plain \"$ab\"");
 system("svn ci -q -mlog \"$ab\"");
 
-$look = SVN::Look->new($repo, -r => 3);
+# Try without specifying a revision or a transaction
+$look = SVN::Look->new($repo);
 
 my $pl = eval { $look->proplist('a b.txt') };
 
@@ -77,3 +78,7 @@ system("svn lock -m \"lock comment\" $wcfile");
 $lock = eval { $look->lock('file') };
 
 ok(defined $lock && ref $lock eq 'HASH', 'lock');
+
+my @tree = eval { $look->tree('--full-paths') };
+
+is(scalar(@tree), 3, 'tree');
