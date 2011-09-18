@@ -45,7 +45,7 @@ in the object, avoiding repetitious calls.
 
 BEGIN {
     my $path = $ENV{PATH} || '';
-    open my $svnlook, '-|', 'svnlook --version'
+    open my $svnlook, '-|', 'svnlook', '--version'
 	or die "Aborting because I couldn't find the 'svnlook' executable in PATH='$path'.\n";
     $_ = <$svnlook>;
     if (my ($major, $minor, $patch) = (/(\d+)\.(\d+)\.(\d+)/)) {
