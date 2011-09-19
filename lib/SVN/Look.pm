@@ -72,7 +72,8 @@ The SVN::Look constructor needs one or three arguments:
 =item REPO is the path to the repository.
 
 =item WHAT must be either '-r' or '-t', specifying if the third
-argument is a revision number or a transaction number, respectivelly.
+argument is a revision number or a transaction number, respectively.
+If neither -r or -t is specified, the HEAD revision is used.
 
 =item NUMBER is either a revision or transaction NUMBER, as specified
 by WHAT.
