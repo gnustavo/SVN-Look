@@ -1,5 +1,11 @@
 Revision history for SVN-Look. -*- text -*-
 
+0.28    2011-10-10
+
+	Reimplementing methods 'repo', 'rev', and 'txn'. They are used
+	by SVN::Hooks::Notify, as I have been kindly reminded by Bill
+	Moseley. Thanks!
+
 0.27    2011-09-17
 
 	Make the arguments -r/-t optional.
