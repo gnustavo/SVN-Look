@@ -390,6 +390,18 @@ sub dirs_changed {
     return @{$self->{dirs_changed}};
 }
 
+=item B<filesize> PATH
+
+Returns the size (in bytes) of the file located at PATH as it is
+represented in the repository.
+
+=cut
+
+sub filesize {
+    my ($self, $path) = @_;
+    return $self->_svnlook('filesize', $path);
+}
+
 =item B<info>
 
 Returns the author, datestamp, log message size, and log message of
