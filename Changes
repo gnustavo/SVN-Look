@@ -1,5 +1,9 @@
 Revision history for SVN-Look. -*- text -*-
 
+0.29    2011-10-12
+
+	Implement method 'filesize', new with Subversion 1.7.0.
+
 0.28    2011-10-10
 
 	Reimplementing methods 'repo', 'rev', and 'txn'. They are used
