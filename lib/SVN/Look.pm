@@ -94,9 +94,9 @@ sub new {
 
 sub _svnlook {
     my ($self, $cmd, @args) = @_;
-    my @cmd = (svnlook => $cmd, $self->{repo});
+    my @cmd = ('svnlook', $cmd, $self->{repo});
     push @cmd, @{$self->{opts}} unless $cmd =~ /^(?:youngest|uuid|lock)$/;
-    open my $fd, '-|', '"' . join('"  "', @cmd, @args) . '"'
+    open my $fd, '-|', @cmd, @args
         or die "Can't exec svnlook $cmd: $!\n";
     if (wantarray) {
         my @lines = <$fd>;
