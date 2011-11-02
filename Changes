@@ -1,5 +1,12 @@
 Revision history for SVN-Look. -*- text -*-
 
+0.30	2011-11-02
+
+	Change the call to svnlook to use execvp directly and avoiding
+	the shell.
+
+	Moved the repository to git (http://code.google.com/p/svn-look/source).
+
 0.29    2011-10-12
 
 	Implement method 'filesize', new with Subversion 1.7.0.
