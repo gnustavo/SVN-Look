@@ -1,21 +1,11 @@
-package SVN::Look;
-
 use strict;
 use warnings;
+
+package SVN::Look;
+# ABSTRACT: A caching wrapper around the svnlook command.
+
 use Carp;
 use File::Spec::Functions;
-
-=head1 NAME
-
-SVN::Look - A caching wrapper aroung the svnlook command.
-
-=head1 VERSION
-
-Version 0.30
-
-=cut
-
-our $VERSION = '0.30';
 
 =head1 SYNOPSIS
 
@@ -59,11 +49,7 @@ BEGIN {
     close $svnlook or die "Can't close svnlook commnand.\n";
 }
 
-=head1 METHODS
-
-=over 4
-
-=item B<new> REPO [, WHAT, NUMBER]
+=method B<new> REPO [, WHAT, NUMBER]
 
 The SVN::Look constructor needs one or three arguments:
 
@@ -113,7 +99,7 @@ sub _svnlook {
     }
 }
 
-=item B<repo>
+=method B<repo>
 
 Returns the repository path that was passed to the constructor.
 
@@ -124,7 +110,7 @@ sub repo {
     return $self->{repo};
 }
 
-=item B<txn>
+=method B<txn>
 
 Returns the transaction number that was passed to the constructor. If
 none was passed, returns undef.
@@ -136,7 +122,7 @@ sub txn {
     return $self->{opts}[0] eq '-t' ? $self->{opts}[1] : undef;
 }
 
-=item B<rev>
+=method B<rev>
 
 Returns the revision number that was passed to the constructor. If
 none was passed, returns undef.
@@ -148,7 +134,7 @@ sub rev {
     return $self->{opts}[0] eq '-r' ? $self->{opts}[1] : undef;
 }
 
-=item B<author>
+=method B<author>
 
 Returns the author of the revision/transaction.
 
@@ -162,7 +148,7 @@ sub author {
     return $self->{author};
 }
 
-=item B<cat> PATH
+=method B<cat> PATH
 
 Returns the contents of the file at PATH. In scalar context, return
 the whole contents in a single string. In list context returns a list
@@ -175,7 +161,7 @@ sub cat {
     return $self->_svnlook('cat', $path);
 }
 
-=item B<changed_hash>
+=method B<changed_hash>
 
 Returns a reference to a hash containing information about all file
 changes occurred in the revision. The hash always has the following
@@ -244,7 +230,7 @@ sub changed_hash {
     return $self->{changed_hash};
 }
 
-=item B<added>
+=method B<added>
 
 Returns the list of files added in the revision/transaction.
 
@@ -255,7 +241,7 @@ sub added {
     return @{$self->changed_hash()->{added}};
 }
 
-=item B<updated>
+=method B<updated>
 
 Returns the list of files updated in the revision/transaction.
 
@@ -266,7 +252,7 @@ sub updated {
     return @{$self->changed_hash()->{updated}};
 }
 
-=item B<deleted>
+=method B<deleted>
 
 Returns the list of files deleted in the revision/transaction.
 
@@ -277,7 +263,7 @@ sub deleted {
     return @{$self->changed_hash()->{deleted}};
 }
 
-=item B<prop_modified>
+=method B<prop_modified>
 
 Returns the list of files that had properties modified in the
 revision/transaction.
@@ -289,7 +275,7 @@ sub prop_modified {
     return @{$self->changed_hash()->{prop_modified}};
 }
 
-=item B<changed>
+=method B<changed>
 
 Returns the list of all files added, updated, deleted, and the ones
 that had properties modified in the revision/transaction.
@@ -305,7 +291,7 @@ sub changed {
     return @{$hash->{changed}};
 }
 
-=item B<copied_to>
+=method B<copied_to>
 
 Returns the list of new names of files that were copied in the
 revision/transaction.
@@ -317,7 +303,7 @@ sub copied_to {
     return keys %{$self->changed_hash()->{copied}};
 }
 
-=item B<copied_from>
+=method B<copied_from>
 
 Returns the list of original names of files that were copied in the
 revision/transaction. The order of this list is guaranteed to agree
@@ -330,7 +316,7 @@ sub copied_from {
     return map {$_->[0]} values %{$self->changed_hash()->{copied}};
 }
 
-=item B<date>
+=method B<date>
 
 Returns the date of the revision/transaction.
 
@@ -344,7 +330,7 @@ sub date {
     return $self->{date};
 }
 
-=item B<diff> [OPTS, ...]
+=method B<diff> [OPTS, ...]
 
 Returns the GNU-style diffs of changed files and properties. There are
 three optional options that can be passed as strings:
@@ -375,7 +361,7 @@ sub diff {
     return $self->_svnlook('diff', @opts);
 }
 
-=item B<dirs_changed>
+=method B<dirs_changed>
 
 Returns the list of directories changed in the revision/transaction.
 
@@ -390,7 +376,7 @@ sub dirs_changed {
     return @{$self->{dirs_changed}};
 }
 
-=item B<filesize> PATH
+=method B<filesize> PATH
 
 Returns the size (in bytes) of the file located at PATH as it is
 represented in the repository.
@@ -402,7 +388,7 @@ sub filesize {
     return $self->_svnlook('filesize', $path);
 }
 
-=item B<info>
+=method B<info>
 
 Returns the author, datestamp, log message size, and log message of
 the revision/transaction.
@@ -414,7 +400,7 @@ sub info {
     return $self->_svnlook('info');
 }
 
-=item B<lock> PATH
+=method B<lock> PATH
 
 If PATH has a lock, returns a hash containing information about the lock, with the following keys:
 
@@ -462,7 +448,7 @@ sub lock {
     return %lock ? \%lock : undef;
 }
 
-=item B<log_msg>
+=method B<log_msg>
 
 Returns the log message of the revision/transaction.
 
@@ -476,7 +462,7 @@ sub log_msg {
     return $self->{log};
 }
 
-=item B<propget> PROPNAME PATH
+=method B<propget> PROPNAME PATH
 
 Returns the value of PROPNAME in PATH.
 
@@ -487,7 +473,7 @@ sub propget {
     return $self->_svnlook('propget', @args);
 }
 
-=item B<proplist> PATH
+=method B<proplist> PATH
 
 Returns a reference to a hash containing the properties associated with PATH.
 
@@ -505,7 +491,7 @@ sub proplist {
     return $self->{proplist}{$path};
 }
 
-=item B<tree> [PATH_IN_REPOS, OPTS, ...]
+=method B<tree> [PATH_IN_REPOS, OPTS, ...]
 
 Returns the repository tree as a list of paths, starting at
 PATH_IN_REPOS (if supplied, at the root of the tree otherwise),
@@ -534,7 +520,7 @@ sub tree {
     return $self->_svnlook('tree', @args);
 }
 
-=item B<uuid>
+=method B<uuid>
 
 Returns the repository's UUID.
 
@@ -545,7 +531,7 @@ sub uuid {
     return $self->_svnlook('uuid');
 }
 
-=item B<youngest>
+=method B<youngest>
 
 Returns the repository's youngest revision number.
 
@@ -555,54 +541,5 @@ sub youngest {
     my ($self) = @_;
     return $self->_svnlook('youngest');
 }
-
-=back
-
-=head1 AUTHOR
-
-Gustavo Chaves, C<< <gnustavo@cpan.org> >>
-
-=head1 BUGS
-
-Please report any bugs or feature requests to C<bug-svn-look at rt.cpan.org>, or through
-the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=SVN-Hooks>.  I will be notified, and then you'll
-automatically be notified of progress on your bug as I make changes.
-
-=head1 SUPPORT
-
-You can find documentation for this module with the perldoc command.
-
-    perldoc SVN::Look
-
-You can also look for information at:
-
-=over 4
-
-=item * RT: CPAN's request tracker
-
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=SVN-Hooks>
-
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/SVN-Hooks>
-
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/SVN-Hooks>
-
-=item * Search CPAN
-
-L<http://search.cpan.org/dist/SVN-Hooks>
-
-=back
-
-=head1 COPYRIGHT & LICENSE
-
-Copyright 2008-2011 CPqD, all rights reserved.
-
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
-
-=cut
 
 1; # End of SVN::Look
