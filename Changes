@@ -1,5 +1,7 @@
 Revision history for SVN-Look. -*- text -*-
 
+{{$NEXT}}
+
 0.30	2011-11-02
 
 	Change the call to svnlook to use execvp directly and avoiding
