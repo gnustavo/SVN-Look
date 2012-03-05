@@ -1,3 +1,4 @@
+/.build/
 /t/author.enabled
 /SVN-Look-*
 *.bak
