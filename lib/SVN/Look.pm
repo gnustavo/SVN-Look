@@ -36,7 +36,7 @@ in the object, avoiding repetitious calls.
 
 BEGIN {
     my $path = $ENV{PATH} || '';
-    open my $svnlook, '-|', 'svnlook', '--version'
+    open my $svnlook, 'svnlook --version |' ## no critic (InputOutput::ProhibitTwoArgOpen)
 	or die "Aborting because I couldn't find the 'svnlook' executable in PATH='$path'.\n";
     $_ = <$svnlook>;
     if (my ($major, $minor, $patch) = (/(\d+)\.(\d+)\.(\d+)/)) {
@@ -83,7 +83,8 @@ sub _svnlook {
     my ($self, $cmd, @args) = @_;
     my @cmd = ('svnlook', $cmd, $self->{repo});
     push @cmd, @{$self->{opts}} unless $cmd =~ /^(?:youngest|uuid|lock)$/;
-    open my $fd, '-|', @cmd, @args
+    my $args = @args ? '"' . join('" "', @args) . '"' : '';
+    open my $fd, join(' ', @cmd, $args, '|') ## no critic (InputOutput::ProhibitTwoArgOpen)
         or die "Can't exec svnlook $cmd: $!\n";
     if (wantarray) {
         my @lines = <$fd>;
