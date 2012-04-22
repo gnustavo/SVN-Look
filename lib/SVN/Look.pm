@@ -26,7 +26,7 @@ use File::Spec::Functions;
 
 The svnlook command is the workhorse of Subversion hook scripts, being
 used to gather all sorts of information about a repository, its
-revisions, and its transactions. This script provides a simple object
+revisions, and its transactions. This module provides a simple object
 oriented interface to a specific svnlook invocation, to make it easier
 to hook writers to get and use the information they need. Moreover,
 all the information gathered buy calling the svnlook command is cached
