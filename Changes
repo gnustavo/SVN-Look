@@ -2,6 +2,11 @@ Revision history for SVN-Look. -*- text -*-
 
 {{$NEXT}}
 
+	Fix proplist, which died when invoked on an artifact with no
+	properties. Now it returns an empty hash.
+
+	Improve error messages upon svnlook command failure.
+
 0.35      2012-04-21 21:13:18 America/Sao_Paulo
 
 	Moved from Google Code to GitHub.
