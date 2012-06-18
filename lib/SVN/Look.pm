@@ -88,14 +88,26 @@ sub _svnlook {
         or die "Can't exec svnlook $cmd: $!\n";
     if (wantarray) {
         my @lines = <$fd>;
-        close $fd or die "Failed closing svnlook $cmd: $!\n";
+        unless (close $fd) {
+	    if ($!) {
+		die "Error closing (wantarray) svnlook $cmd pipe: $!\n";
+	    } else {
+		die "Exit status $? from (wantarray) svnlook $cmd\n";
+	    }
+	}
         chomp @lines;
         return @lines;
     }
     else {
         local $/ = undef;
         my $line = <$fd>;
-        close $fd or die "Failed closing svnlook $cmd: $!\n";
+        unless (close $fd) {
+	    if ($!) {
+		die "Error closing svnlook $cmd pipe: $!\n";
+	    } else {
+		die "Exit status $? from svnlook $cmd\n";
+	    }
+	}
         chomp $line unless $cmd eq 'cat';
         return $line;
     }
