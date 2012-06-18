@@ -2,6 +2,8 @@ Revision history for SVN-Look. -*- text -*-
 
 {{$NEXT}}
 
+0.36      2012-06-18 14:05:44 America/Sao_Paulo
+
 	Fix proplist, which died when invoked on an artifact with no
 	properties. Now it returns an empty hash.
 
