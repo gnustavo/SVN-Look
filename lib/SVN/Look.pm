@@ -484,7 +484,8 @@ Returns a reference to a hash containing the properties associated with PATH.
 sub proplist {
     my ($self, $path) = @_;
     unless ($self->{proplist}{$path}) {
-        my $text = $self->_svnlook('proplist', '--verbose', $path);
+        my $text = eval {$self->_svnlook('proplist', '--verbose', $path)};
+	return {} unless $text;
         my @list = split /^\s\s(\S+)\s:\s/m, $text;
         shift @list;            # skip the leading empty field
         chomp(my %hash = @list);
