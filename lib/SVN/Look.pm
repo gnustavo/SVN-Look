@@ -7,6 +7,7 @@ package SVN::Look;
 
 use Carp;
 use File::Spec::Functions;
+use List::MoreUtils qw{uniq};
 
 =head1 SYNOPSIS
 
@@ -300,7 +301,10 @@ sub changed {
     my $self = shift;
     my $hash = $self->changed_hash();
     unless (exists $hash->{changed}) {
-        $hash->{changed} = [@{$hash->{added}}, @{$hash->{updated}}, @{$hash->{deleted}}, @{$hash->{prop_modified}}];
+        $hash->{changed} = [sort(uniq(@{$hash->{added}},
+				      @{$hash->{updated}},
+				      @{$hash->{deleted}},
+				      @{$hash->{prop_modified}}))];
     }
     return @{$hash->{changed}};
 }
