@@ -24,7 +24,7 @@ if ($@) {
     # CPAN Testers says
     # (http://wiki.cpantesters.org/wiki/CPANAuthorNotes) that we
     # should simply exit normally before generating the Makefile if
-    # there is an unmet depencency.
+    # there is an unmet dependency.
     exit 0;
 }
 
