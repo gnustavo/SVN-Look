@@ -501,7 +501,8 @@ sub proplist {
     my ($self, $path) = @_;
     unless ($self->{proplist}{$path}) {
         my $text = $self->_svnlook('proplist', '--verbose', $path);
-        my @list = split /^\s\s(\S+)\s:\s/m, $text;
+        my @list = split /^\s{2}(\S+)\n\s{4}/m, $text;
+
         shift @list;            # skip the leading empty field
         chomp(my %hash = @list);
         $self->{proplist}{$path} = \%hash;
