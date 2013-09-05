@@ -35,14 +35,16 @@ in the object, avoiding repetitious calls.
 
 =cut
 
+my @SVN_VERSION;
+
 BEGIN {
     my $path = $ENV{PATH} || '';
     open my $svnlook, 'svnlook --version |' ## no critic (InputOutput::ProhibitTwoArgOpen)
 	or die "Aborting because I couldn't find the 'svnlook' executable in PATH='$path'.\n";
     $_ = <$svnlook>;
-    if (my ($major, $minor, $patch) = (/(\d+)\.(\d+)\.(\d+)/)) {
-	$major > 1 || $major == 1 && $minor >= 4
-	    or die "I need at least version 1.4.0 of svnlook but you have only $major.$minor.$patch in PATH='$path'.\n";
+    if (@SVN_VERSION = (/(\d+)\.(\d+)\.(\d+)/)) {
+        $SVN_VERSION[0] > 1 || $SVN_VERSION[0] == 1 && $SVN_VERSION[1] >= 4
+	    or die "I need at least version 1.4.0 of svnlook but you have only ", join('.', @SVN_VERSION), " in PATH='$path'.\n";
     } else {
 	die "Can't grok Subversion version from svnlook --version command.\n";
     }
@@ -497,14 +499,37 @@ Returns a reference to a hash containing the properties associated with PATH.
 
 =cut
 
+# The 'svnlook proplist' command had its output format changed in svn
+# 1.8.0. So, in order to make the code more stable we try to use the
+# --xml option. However, this option was implemented on svn 1.6.0
+# only. Since we still want to support older Subversions we have to
+# check if we can use that option first. See discussion on
+# https://github.com/gnustavo/SVN-Look/pull/1.
+
+my $proplist_does_support_xml_option;
+
 sub proplist {
     my ($self, $path) = @_;
+
     unless ($self->{proplist}{$path}) {
-        my $text = $self->_svnlook('proplist', '--verbose', $path);
-        my @list = split /^\s\s(\S+)\s:\s/m, $text;
-        shift @list;            # skip the leading empty field
-        chomp(my %hash = @list);
-        $self->{proplist}{$path} = \%hash;
+        $proplist_does_support_xml_option = $SVN_VERSION[0] > 1 || $SVN_VERSION[0] == 1 && $SVN_VERSION[1] >= 8
+            unless defined $proplist_does_support_xml_option;
+
+        if ($proplist_does_support_xml_option) {
+            my $xml = $self->_svnlook(qw/proplist --verbose --xml/, $path);
+            require XML::Simple;
+            my $dom = XML::Simple::XMLin($xml, ForceArray => ['property']);
+            while (my ($prop, $value) = each %{$dom->{target}{property}}) {
+                $self->{proplist}{$path}{$prop} = $value->{content};
+            }
+        } else {
+            # Old syntax up to SVN 1.7.
+            my $text = $self->_svnlook('proplist', '--verbose', $path);
+            my @list = split /^\s\s(\S+)\s:\s/m, $text;
+            shift @list;        # skip the leading empty field
+            chomp(my %hash = @list);
+            $self->{proplist}{$path} = \%hash;
+        }
     }
     return $self->{proplist}{$path};
 }
