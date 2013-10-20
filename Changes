@@ -2,6 +2,8 @@ Revision history for SVN-Look. -*- text -*-
 
 {{$NEXT}}
 
+0.39      2013-10-20 21:31:50 America/Sao_Paulo
+
 0.38      2012-06-19 14:00:00 America/Sao_Paulo
 
 	Method "changed" now returns the entries sorted and with no
