@@ -86,9 +86,43 @@ sub _svnlook {
     my ($self, $cmd, @args) = @_;
     my @cmd = ('svnlook', $cmd, $self->{repo});
     push @cmd, @{$self->{opts}} unless $cmd =~ /^(?:youngest|uuid|lock)$/;
-    my $args = @args ? '"' . join('" "', @args) . '"' : '';
-    open my $fd, join(' ', @cmd, $args, '|') ## no critic (InputOutput::ProhibitTwoArgOpen)
-        or die "Can't exec svnlook $cmd: $!\n";
+
+    my $fd;
+    my $tmpfile;
+    if ($^O ne 'MSWin32') {
+	open $fd, '-|', @cmd, @args
+	    or die "Can't exec svnlook $cmd: $!\n";
+    } else {
+	# Windows doesn't support the three-argument version of open
+	# neither the pipe function. So we run the svnlook command
+	# with system, sending its output to a temporary file and
+	# opening the file later in $fd.
+
+	# Create the temporary file.
+	require File::Temp;
+	$tmpfile = File::Temp->new();
+	my $filename = $tmpfile->filename;
+
+	## no critic (ProhibitTwoArgOpen, ProhibitBarewordFileHandles)
+
+	# Dup STDOUT and direct it to the file
+	no warnings 'once';
+	open OLDOUT, '>&STDOUT'   or die "Can't dup STDOUT: $!\n";
+	open STDOUT, ">$filename" or die "Can't redirect STDOUT to $filename: $!\n";
+
+	# Shell out the svnlook command
+	system(@cmd, @args) == 0
+	    or die "system @cmd failed: $?\n";
+
+	# Restore STDOUT
+	open STDOUT, '>&OLDOUT' or die "Can't redirect STDOUT to its former value: $!\n";
+
+	# Open the temporary file
+	open $fd, "<$filename" or die "Can't open $filename: $!\n";
+
+	## use critic
+    }
+
     if (wantarray) {
         my @lines = <$fd>;
         unless (close $fd) {
