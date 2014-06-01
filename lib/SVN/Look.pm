@@ -1,3 +1,5 @@
+## no critic (Modules::RequireExplicitPackage, InputOutput::RequireBriefOpen)
+
 use 5.008_000;
 use strict;
 use warnings;
@@ -39,12 +41,19 @@ my @SVN_VERSION;
 
 BEGIN {
     my $path = $ENV{PATH} || '';
+
+    # Perl on Windows doesn't support the piped three-arg open. So we use
+    # the two-arg open here and don't care about Perl::Critic since this is
+    # a fixed string command.
+
     open my $svnlook, 'svnlook --version |' ## no critic (InputOutput::ProhibitTwoArgOpen)
 	or die "Aborting because I couldn't find the 'svnlook' executable in PATH='$path'.\n";
     $_ = <$svnlook>;
     if (@SVN_VERSION = (/(\d+)\.(\d+)\.(\d+)/)) {
-        $SVN_VERSION[0] > 1 || $SVN_VERSION[0] == 1 && $SVN_VERSION[1] >= 4
-	    or die "I need at least version 1.4.0 of svnlook but you have only ", join('.', @SVN_VERSION), " in PATH='$path'.\n";
+        unless ($SVN_VERSION[0] > 1 || $SVN_VERSION[0] == 1 && $SVN_VERSION[1] >= 4) {
+	    die "I need at least version 1.4.0 of svnlook but you have only ",
+                join('.', @SVN_VERSION), " in PATH='$path'.\n";
+        }
     } else {
 	die "Can't grok Subversion version from svnlook --version command.\n";
     }
@@ -106,7 +115,7 @@ sub _svnlook {
 	## no critic (ProhibitTwoArgOpen, ProhibitBarewordFileHandles)
 
 	# Dup STDOUT and direct it to the file
-	no warnings 'once';
+	no warnings 'once';     ## no critic (TestingAndDebugging::ProhibitNoWarnings)
 	open OLDOUT, '>&STDOUT'   or die "Can't dup STDOUT: $!\n";
 	open STDOUT, ">$filename" or die "Can't redirect STDOUT to $filename: $!\n";
 
@@ -482,7 +491,7 @@ If PATH has no lock, returns undef.
 
 =cut
 
-sub lock {
+sub lock {                      ## no critic (ProhibitBuiltinHomonyms)
     my ($self, $path) = @_;
     my %lock = ();
     my @lock = $self->_svnlook('lock', $path);
