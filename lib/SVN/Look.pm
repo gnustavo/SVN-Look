@@ -554,7 +554,16 @@ sub proplist {
             require XML::Simple;
             my $dom = XML::Simple::XMLin($xml, ForceArray => ['property']);
             while (my ($prop, $value) = each %{$dom->{target}{property}}) {
-                $self->{proplist}{$path}{$prop} = $value->{content};
+                my $content = $value->{content};
+                if (my $encoding = $value->{encoding}) {
+                    if ($encoding eq 'base64') {
+                        require MIME::Base64;
+                        $content = MIME::Base64::decode($content);
+                    } else {
+                        die "Don't know how to decode property '$prop' value encoded as '$encoding'\n";
+                    }
+                }
+                $self->{proplist}{$path}{$prop} = $content;
             }
         } else {
             # Old syntax up to SVN 1.7.
