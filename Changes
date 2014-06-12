@@ -2,6 +2,22 @@ Revision history for SVN-Look. -*- text -*-
 
 {{$NEXT}}
 
+0.40      2014-06-12 15:04:39-03:00 America/Sao_Paulo
+
+[Fixes]
+
+- Fix security issue when invoking external commands.
+
+- Support base64 encoded property values.
+
+- Don't strip trailing spaces from filenames grokked by the changed_hash
+  method.
+
+[Thanks]
+
+- Many thanks to Stephane Chazelas who reported the issues fixed in this
+  version.
+
 0.39      2013-10-20 21:31:50 America/Sao_Paulo
 
 0.38      2012-06-19 14:00:00 America/Sao_Paulo
