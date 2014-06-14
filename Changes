@@ -2,6 +2,12 @@ Revision history for SVN-Look. -*- text -*-
 
 {{$NEXT}}
 
+0.41      2014-06-13 23:50:53-03:00 America/Sao_Paulo
+
+[Fixes]
+
+- Restore support for Perl 5.8.
+
 0.40      2014-06-12 15:04:39-03:00 America/Sao_Paulo
 
 [Fixes]
