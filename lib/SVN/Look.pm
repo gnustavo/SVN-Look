@@ -260,7 +260,7 @@ sub changed_hash {
         foreach ($self->_svnlook('changed', '--copy-info')) {
             next if length($_) <= 4;
             chomp;
-            my ($action, $prop, $changed) = unpack 'AAxx a*';
+            my ($action, $prop, $changed) = unpack 'AAxx a*', $_;
             if    ($action eq 'A') {
                 push @added,   $changed;
             }
