@@ -5,7 +5,7 @@ use strict;
 use warnings;
 
 package SVN::Look;
-# ABSTRACT: A caching wrapper around the svnlook command.
+# ABSTRACT: Caching wrapper around the svnlook command
 
 use Carp;
 use File::Spec::Functions;
