@@ -638,3 +638,7 @@ sub youngest {
 }
 
 1; # End of SVN::Look
+
+=head1 REPOSITORY
+
+L<https://github.com/gnustavo/SVN-Look>
