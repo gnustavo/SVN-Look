@@ -47,7 +47,7 @@ BEGIN {
     # a fixed string command.
 
     open my $svnlook, 'svnlook --version |' ## no critic (InputOutput::ProhibitTwoArgOpen)
-	or die "Aborting because I couldn't find the 'svnlook' executable in PATH='$path'.\n";
+        or die "Aborting because I couldn't find the 'svnlook' executable in PATH='$path'.\n";
     $_ = <$svnlook>;
     if (@SVN_VERSION = (/(\d+)\.(\d+)\.(\d+)/)) {
         unless ($SVN_VERSION[0] > 1 || $SVN_VERSION[0] == 1 && $SVN_VERSION[1] >= 4) {
@@ -55,9 +55,9 @@ BEGIN {
                 join('.', @SVN_VERSION), " in PATH='$path'.\n";
         }
     } else {
-	die "Can't grok Subversion version from svnlook --version command.\n";
+        die "Can't grok Subversion version from svnlook --version command.\n";
     }
-    local $/ = undef;		# slurp mode
+    local $/ = undef;           # slurp mode
     <$svnlook>;
     close $svnlook or die "Can't close svnlook command.\n";
 }
@@ -99,48 +99,48 @@ sub _svnlook {
     my $fd;
     my $tmpfile;
     if ($^O ne 'MSWin32') {
-	open $fd, '-|', @cmd, @args
-	    or die "Can't exec svnlook $cmd: $!\n";
+        open $fd, '-|', @cmd, @args
+            or die "Can't exec svnlook $cmd: $!\n";
     } else {
-	# Windows doesn't support the three-argument version of open
-	# neither the pipe function. So we run the svnlook command
-	# with system, sending its output to a temporary file and
-	# opening the file later in $fd.
+        # Windows doesn't support the three-argument version of open
+        # neither the pipe function. So we run the svnlook command
+        # with system, sending its output to a temporary file and
+        # opening the file later in $fd.
 
-	# Create the temporary file.
-	require File::Temp;
-	$tmpfile = File::Temp->new();
-	my $filename = $tmpfile->filename;
+        # Create the temporary file.
+        require File::Temp;
+        $tmpfile = File::Temp->new();
+        my $filename = $tmpfile->filename;
 
-	## no critic (ProhibitTwoArgOpen, ProhibitBarewordFileHandles)
+        ## no critic (ProhibitTwoArgOpen, ProhibitBarewordFileHandles)
 
-	# Dup STDOUT and direct it to the file
-	no warnings 'once';     ## no critic (TestingAndDebugging::ProhibitNoWarnings)
-	open OLDOUT, '>&STDOUT'   or die "Can't dup STDOUT: $!\n";
-	open STDOUT, ">$filename" or die "Can't redirect STDOUT to $filename: $!\n";
+        # Dup STDOUT and direct it to the file
+        no warnings 'once';     ## no critic (TestingAndDebugging::ProhibitNoWarnings)
+        open OLDOUT, '>&STDOUT'   or die "Can't dup STDOUT: $!\n";
+        open STDOUT, ">$filename" or die "Can't redirect STDOUT to $filename: $!\n";
 
-	# Shell out the svnlook command
-	system(@cmd, @args) == 0
-	    or die "system @cmd failed: $?\n";
+        # Shell out the svnlook command
+        system(@cmd, @args) == 0
+            or die "system @cmd failed: $?\n";
 
-	# Restore STDOUT
-	open STDOUT, '>&OLDOUT' or die "Can't redirect STDOUT to its former value: $!\n";
+        # Restore STDOUT
+        open STDOUT, '>&OLDOUT' or die "Can't redirect STDOUT to its former value: $!\n";
 
-	# Open the temporary file
-	open $fd, "<$filename" or die "Can't open $filename: $!\n";
+        # Open the temporary file
+        open $fd, "<$filename" or die "Can't open $filename: $!\n";
 
-	## use critic
+        ## use critic
     }
 
     if (wantarray) {
         my @lines = <$fd>;
         unless (close $fd) {
-	    if ($!) {
-		die "Error closing (wantarray) svnlook $cmd pipe: $!\n";
-	    } else {
-		die "Exit status $? from (wantarray) svnlook $cmd\n";
-	    }
-	}
+            if ($!) {
+                die "Error closing (wantarray) svnlook $cmd pipe: $!\n";
+            } else {
+                die "Exit status $? from (wantarray) svnlook $cmd\n";
+            }
+        }
         chomp @lines;
         return @lines;
     }
@@ -148,12 +148,12 @@ sub _svnlook {
         local $/ = undef;
         my $line = <$fd>;
         unless (close $fd) {
-	    if ($!) {
-		die "Error closing svnlook $cmd pipe: $!\n";
-	    } else {
-		die "Exit status $? from svnlook $cmd\n";
-	    }
-	}
+            if ($!) {
+                die "Error closing svnlook $cmd pipe: $!\n";
+            } else {
+                die "Exit status $? from svnlook $cmd\n";
+            }
+        }
         chomp $line unless $cmd eq 'cat';
         return $line;
     }
@@ -347,9 +347,9 @@ sub changed {
     my $hash = $self->changed_hash();
     unless (exists $hash->{changed}) {
         $hash->{changed} = [sort(uniq(@{$hash->{added}},
-				      @{$hash->{updated}},
-				      @{$hash->{deleted}},
-				      @{$hash->{prop_modified}}))];
+                                      @{$hash->{updated}},
+                                      @{$hash->{deleted}},
+                                      @{$hash->{prop_modified}}))];
     }
     return @{$hash->{changed}};
 }
@@ -497,15 +497,15 @@ sub lock {                      ## no critic (ProhibitBuiltinHomonyms)
     my @lock = $self->_svnlook('lock', $path);
 
     while (my $line = shift @lock) {
-	chomp $line;
-	my ($key, $value) = split /:\s*/, $line, 2;
-	if ($key =~ /^Comment/) {
-	    $lock{Comment} = join('', @lock);
-	    last;
-	}
-	else {
-	    $lock{$key} = $value;
-	}
+        chomp $line;
+        my ($key, $value) = split /:\s*/, $line, 2;
+        if ($key =~ /^Comment/) {
+            $lock{Comment} = join('', @lock);
+            last;
+        }
+        else {
+            $lock{$key} = $value;
+        }
     }
 
     return %lock ? \%lock : undef;
