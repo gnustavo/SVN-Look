@@ -1,6 +1,6 @@
 ## no critic (Modules::RequireExplicitPackage, InputOutput::RequireBriefOpen)
 
-use 5.008_000;
+use 5.008;
 use strict;
 use warnings;
 
@@ -50,8 +50,8 @@ BEGIN {
         or die "Aborting because I couldn't find the 'svnlook' executable in PATH='$path'.\n";
     $_ = <$svnlook>;
     if (@SVN_VERSION = (/(\d+)\.(\d+)\.(\d+)/)) {
-        unless ($SVN_VERSION[0] > 1 || $SVN_VERSION[0] == 1 && $SVN_VERSION[1] >= 4) {
-	    die "I need at least version 1.4.0 of svnlook but you have only ",
+        if ($SVN_VERSION[0] < 1 || $SVN_VERSION[0] == 1 && $SVN_VERSION[1] < 4) {
+            die "I need at least version 1.4.0 of svnlook but you have only ",
                 join('.', @SVN_VERSION), " in PATH='$path'.\n";
         }
     } else {
